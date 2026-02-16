@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Group Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        :root {
+            --rbx-bg: #191B1D;
+            --rbx-card: #232527;
+            --rbx-border: #393B3D;
+            --rbx-text-main: #FFFFFF;
+            --rbx-text-sub: #BDC3C7;
+        }
+
+        body {
+            background-color: var(--rbx-bg);
+            color: var(--rbx-text-main);
+            font-family: 'Inter', sans-serif; 
+            margin: 0;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            letter-spacing: -0.01em;
+            font-weight: 500;
+        }
+
+        .rbx-header {
+            background-color: var(--rbx-card);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--rbx-border);
+        }
+
+        .gift-banner {
+            background: linear-gradient(to bottom, #0A0A2E, #000000);
+            height: 160px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .moon {
+            position: absolute;
+            top: 15px;
+            width: 75px;
+            height: 75px;
+            background: #fdfdfd;
+            border-radius: 50%;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
+        }
+
+        .gift-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 6px;
+            z-index: 10;
+        }
+
+        .gift-item img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .gift-label {
+            font-size: 11px;
+            font-weight: 800;
+            margin-top: 4px;
+            text-shadow: 1px 1px 2px black;
+        }
+
+        .main-content {
+            padding: 16px;
+        }
+
+        .rbx-input {
+            background: var(--rbx-card);
+            border: 1px solid var(--rbx-border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            width: 100%;
+            margin-bottom: 10px;
+            color: #FFFFFF;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid var(--rbx-border);
+            margin-top: 15px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            font-size: 14px;
+            color: #ADB1B4;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            color: #FFFFFF;
+            border-bottom: 3px solid #FFFFFF;
+            font-weight: 600;
+        }
+
+        .robux-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-image: url("https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/optimized/5X/c/3/1/e/c31e98bde9c580da9e3586fa580183dccc0050c1_2_468x500.png");
+            background-size: contain;
+            background-repeat: no-repeat;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+
+        .btn-add {
+            border: 1px solid #FFFFFF;
+            background: transparent;
+            color: #FFFFFF;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 20px;
+            cursor: pointer;
+            width: fit-content;
+        }
+
+        .recipient-row {
+            display: flex;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid #232527;
+        }
+
+        .avatar-container {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #393B3D;
+            overflow: hidden;
+            margin-right: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .avatar-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .amount-input-box {
+            background: #121415;
+            border: 1px solid var(--rbx-border);
+            color: white;
+            padding: 10px 12px;
+            border-radius: 8px;
+            width: 110px;
+            text-align: right;
+            outline: none;
+            font-size: 14px;
+        }
+
+        /* Search Styles */
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 100;
+            flex-direction: column;
+            padding-top: 40px;
+        }
+
+        .search-container {
+            width: 90%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-results {
+            background: #121415;
+            border: 1px solid var(--rbx-border);
+            border-radius: 8px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .search-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border-bottom: 1px solid #1a1c1e;
+        }
+
+        .search-item:hover {
+            background: #1e2022;
+        }
+
+        .search-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #393B3D;
+            margin-right: 12px;
+            overflow: hidden;
+        }
+
+        .search-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .primary-btn {
+            background: #FFFFFF;
+            color: #000000;
+            width: 100%;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            margin-top: 25px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .success-overlay {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--rbx-card);
+            padding: 40px 30px;
+            border-radius: 16px;
+            text-align: center;
+            z-index: 200;
+            border: 1px solid var(--rbx-border);
+            width: 85%;
+            max-width: 340px;
+        }
+
+        .loading-dots:after {
+            content: ' .';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { color: rgba(0,0,0,0); text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0); }
+            40% { color: white; text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0); }
+            60% { text-shadow: .25em 0 0 white, .5em 0 0 rgba(0,0,0,0); }
+            80%, 100% { text-shadow: .25em 0 0 white, .5em 0 0 white; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="rbx-header">
+        <div class="flex flex-col">
+            <span class="text-[11px] font-bold text-white leading-tight">JOIN THE GROUP 'roblox gives' for the robux and free giveaways</span>
+            <span class="text-[10px] text-zinc-400 font-medium">top liker gets a give away/ NO SCAM ALL FOR ENTERTAINMENT PURPOSES</span>
+        </div>
+        
+    </div>
+
+    <!-- TikTok Gift Banner -->
+    <div class="gift-banner">
+        <div class="moon"></div>
+        <div class="gift-item">
+            <img src="https://media.tenor.com/4E2JmrCfNtQAAAAj/10.gif" alt="10k gift">
+            <span class="gift-label text-yellow-400">10K</span>
+        </div>
+        <div class="gift-item">
+            <img src="https://p19-webcast.tiktokcdn.com/img/maliva/webcast-va/6cd022271dc4669d182cad856384870f~tplv-obj.png" alt="100k gift">
+            <span class="gift-label text-green-400">100K</span>
+        </div>
+        <div class="gift-item">
+            <img src="https://media.tenor.com/50VxfE-ap3UAAAAj/money.gif" alt="500k gift">
+            <span class="gift-label text-purple-400">500K</span>
+        </div>
+        <div class="gift-item">
+            <img src="https://www.beetgames.com/images/gifts/swan.webp" alt="1m gift">
+            <span class="gift-label text-white">1M</span>
+        </div>
+        <div class="gift-item">
+            <img src="https://www.beetgames.com/images/gifts/galaxy.webp" alt="1.5m gift">
+            <span class="gift-label text-blue-300">1.5M</span>
+        </div>
+        <div class="gift-item">
+            <img src="https://www.beetgames.com/images/gifts/motorcycle_together.webp" alt="10m gift">
+            <span class="gift-label text-red-400">10M</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="flex justify-between items-baseline mb-1">
+            <h1 class="text-[26px] font-semibold tracking-tight">Configure roblox gives</h1>
+            <span class="text-[13px] text-zinc-400 font-medium cursor-pointer">Back</span>
+        </div>
+        <p class="text-[14px] text-zinc-400 mb-4 font-medium">By Minceicy</p>
+        
+        <p class="text-[16px] font-bold mb-6 flex items-center">
+            Group Funds: <span class="robux-icon ml-2"></span> <span id="group-funds-display">689,544,948</span>
+        </p>
+
+        <div class="rbx-input">
+            <span class="text-[13px] text-zinc-400">Revenue</span>
+            <svg class="w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2.5"></path></svg>
+        </div>
+        <div class="rbx-input">
+            <span class="text-[13px] text-zinc-400">Payouts</span>
+            <svg class="w-5 h-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2.5"></path></svg>
+        </div>
+
+        <div class="tab-container">
+            <div class="tab">Recurring Payout</div>
+            <div class="tab active">One-time Payout</div>
+        </div>
+
+        <div class="mt-6">
+            <h2 class="text-[18px] font-semibold">One-time Payout</h2>
+            <div class="flex items-center gap-2 mt-4 text-[13px] text-zinc-400 font-medium">
+                <span>Distribute by:</span>
+                <div class="bg-[#2D2F31] px-4 py-1.5 rounded-lg flex items-center gap-2 border border-zinc-700">
+                    <span class="text-white">Amount</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2.5"></path></svg>
+                </div>
+            </div>
+
+            <button class="btn-add" onclick="openModal()">Add Recipient</button>
+
+            <div id="recipients-list" class="mt-4">
+                <!-- Row template created in JS -->
+            </div>
+
+            <div class="primary-btn" onclick="sendRobux()">Distribute</div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div id="modal">
+        <div class="search-container">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Search Recipients</h3>
+                <button onclick="closeModal()" class="text-zinc-400 text-sm">Close</button>
+            </div>
+            
+            <div class="relative">
+                <input type="text" id="username-search" 
+                       class="rbx-input mb-0 w-full px-4 py-4 border-2 border-zinc-700 focus:border-white outline-none" 
+                       placeholder="Enter username..."
+                       oninput="handleSearch(this.value)">
+                <div id="search-loading" class="absolute right-4 top-4 text-xs text-zinc-500 hidden font-bold">
+                    Searching<span class="loading-dots"></span>
+                </div>
+            </div>
+
+            <div id="results-box" class="search-results">
+                <!-- Search Items -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Feedback -->
+    <div id="success-message" class="success-overlay">
+        <div class="text-green-500 mb-4">
+            <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <h2 class="text-2xl font-bold">Payout Sent</h2>
+        <p class="text-zinc-400 mt-3 text-sm">Funds have been successfully deducted from the group and sent.</p>
+        <button class="mt-8 w-full py-4 bg-white text-black font-bold rounded-xl" onclick="hideSuccess()">Okay</button>
+    </div>
+
+    <script>
+        let currentFunds = 689544948;
+        let lastAvatarIndex = -1;
+        let searchTimeout = null;
+
+        const avatarPool = [
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-418744A02134C7C82A570AA3BF8A4ABA-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D169DEE5DAE343A1855B88EDFEB482C7-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6E681112F32CDB9B1C9069A0190A3FBB-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-1F01F33E435CEAABC1154E412AB93043-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-ED88F4A9514BA8976E6FA6B18CFCB6D7-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-44BB6240D9C960E1536BA7D8D382D92C-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-03447DE7C8F70B7C75AC2CA6E621D8A2-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-1D24CBFCB6932769EBB50CEADF06A603-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-528BEC21C8B5FA0A4563FD3E9895CDD8-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C83AB49FEFF5B3E1CE34BA7A63C6B3A6-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-075FC2576523D385552F42FFC5C2CFCB-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0C025C6781CFF48C4EE107C1CE4B78EF-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E9658326F2FCFC870E36EDB50CC0C827-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-581B6D6B5B4C11294AE029EA9BEDFA4F-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-2C89B13913C388A855E40A23A10D18DA-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-EFEB392988232B8E5138EAA40EC3DA60-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-22C85BFD514258FE5F77A6E6FB2673BE-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-EB91D8B82289F02910F616D342C09997-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-41DA12D824F696DE9E505EE4F2E6D840-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7304F891665AEC7336F19FDD4DFC3337-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-F6363C838818BBF0C045C09C8DD945B0-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6AD7E7F608CCC8EBFDD496A713A8CBE2-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E2EC79770E4B897C8CDDDA78B9D8B8F1-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0187B60A716D151A68E1B2F96774CD0A-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-6AC798A326530707374EBC81FEB84262-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0F2A90DED6D7165487001D96ECAE08D1-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-5AD8CB5CB872A0A6B2E9304F51F76A64-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A334A70B3BBF2A0961A4900637AF8BF8-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0F5A40A8F160BB9CE98D135B9AA05D1C-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0C888E7C9DF4CFEACC76EEEDAE25863C-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-031D54B185354CD498648850AF75B836-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-E87BC6EEB31057FC2B007FB30F9E7994-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-5F21800F0F05EF7773294769C0BF91CC-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-05092CDDCD188B8740380800738BB0AD-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-D55E0656B3A14FB19CC2CBE9B264010F-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B9B0C58E76695CAC7CE8D1D445EE6A3F-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7CD9BC5FD3F51C371180DAC2AA422492-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-A7B250DE2257D9572AA828953D87622F-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-152F645805D7D75963B2DD4EDDCBB21E-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-747AB49A2CAE7BF90943155B3055EF63-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-EDEC640FD09462789758CC29BC744A68-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-B1DA048956AB05CF90043A46D2E1F8E3-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-5FCFC44439E3FF05CBB29CED2D08BB51-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-F09345BB109AB33FDEAED5F6B65E46FF-Png/150/150/AvatarHeadshot/Webp/noFilter",
+            "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-3B96B2F8FCA67A646235365EC7C6D8E1-Png/150/150/AvatarHeadshot/Webp/noFilter"
+        ];
+
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function updateFundsDisplay() {
+            document.getElementById('group-funds-display').innerText = formatNumber(currentFunds);
+        }
+
+        function openModal() {
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('username-search').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('username-search').value = '';
+            document.getElementById('results-box').style.display = 'none';
+        }
+
+        function hideSuccess() {
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function handleSearch(val) {
+            const resultsBox = document.getElementById('results-box');
+            const loading = document.getElementById('search-loading');
+            
+            if (!val.trim()) {
+                resultsBox.style.display = 'none';
+                loading.classList.add('hidden');
+                return;
+            }
+
+            // Ensure starts with @
+            if (!val.startsWith('@')) {
+                document.getElementById('username-search').value = '@' + val;
+            }
+
+            loading.classList.remove('hidden');
+            resultsBox.style.display = 'none';
+
+            if (searchTimeout) clearTimeout(searchTimeout);
+
+            searchTimeout = setTimeout(() => {
+                loading.classList.add('hidden');
+                resultsBox.style.display = 'block';
+                
+                const cleanName = val.replace('@', '');
+                resultsBox.innerHTML = '';
+                
+                for(let i=0; i < 4; i++) {
+                    const suffix = i === 0 ? '' : (Math.floor(Math.random() * 999));
+                    const optionName = cleanName + suffix;
+                    const avatar = avatarPool[Math.floor(Math.random() * avatarPool.length)];
+                    
+                    const item = document.createElement('div');
+                    item.className = 'search-item';
+                    item.onclick = () => selectUser(optionName, avatar);
+                    item.innerHTML = `
+                        <div class="search-avatar"><img src="${avatar}"></div>
+                        <div>
+                            <div class="text-white font-bold text-sm">@${optionName}</div>
+                            <div class="text-zinc-500 text-xs">Member</div>
+                        </div>
+                    `;
+                    resultsBox.appendChild(item);
+                }
+            }, 600);
+        }
+
+        function selectUser(username, avatar) {
+            const list = document.getElementById('recipients-list');
+            const row = document.createElement('div');
+            row.className = 'recipient-row';
+            row.innerHTML = `
+                <div class="avatar-container">
+                    <img src="${avatar}" alt="avatar">
+                </div>
+                <div class="flex-grow">
+                    <div class="text-[15px] font-bold">${username}</div>
+                    <div class="text-[12px] text-zinc-500 font-medium">Member</div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="robux-icon"></span>
+                    <input type="number" class="amount-input-box" value="0">
+                </div>
+            `;
+            
+            list.appendChild(row);
+            closeModal();
+        }
+
+        function sendRobux() {
+            const inputs = document.querySelectorAll('.amount-input-box');
+            let totalDeduction = 0;
+            inputs.forEach(input => {
+                totalDeduction += parseInt(input.value) || 0;
+            });
+
+            if (totalDeduction <= 0) return;
+
+            if (totalDeduction > currentFunds) {
+                alert("Insufficient Group Funds!");
+                return;
+            }
+
+            const btn = document.querySelector('.primary-btn');
+            btn.innerHTML = 'DISTRIBUTING...';
+            btn.style.opacity = '0.5';
+            btn.style.pointerEvents = 'none';
+            
+            setTimeout(() => {
+                currentFunds -= totalDeduction;
+                updateFundsDisplay();
+                document.getElementById('success-message').style.display = 'block';
+                btn.innerHTML = 'Distribute';
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            }, 1800);
+        }
+
+        updateFundsDisplay();
+    </script>
+</body>
+</html>
